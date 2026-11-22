@@ -5,12 +5,15 @@ Sweeps your local IPv4 subnet with ICMP echo, reads the OS ARP table,
 reverse-resolves names, and diffs against a baseline that never leaves
 this machine.
 
+  python3 rex-network-watcher.py router 192.168.1.1
   python3 rex-network-watcher.py sweep
   python3 rex-network-watcher.py sweep --json
   python3 rex-network-watcher.py accept
   python3 rex-network-watcher.py diff
   python3 rex-network-watcher.py selftest
 
+The router address is required on a new machine and is saved under
+~/.local/share/rex-network-watcher/. Change it any time with `router`.
 Only private prefixes of /24 or smaller are allowed. There is no port
 scan, no credential use, and no upload.
 """
@@ -32,6 +35,7 @@ from pathlib import Path
 ROOT = Path.home() / ".local" / "share" / "rex-network-watcher"
 DAYS = ROOT / "days"
 KNOWN = ROOT / "known.json"
+ROUTER = ROOT / "router"
 
 
 def norm_mac(value: str) -> str | None:
@@ -57,6 +61,32 @@ def assert_private(net: ipaddress.IPv4Network) -> None:
         raise SystemExit(f"Refusing {net}. This tool only sweeps private local subnets.")
     if net.prefixlen < 24:
         raise SystemExit(f"Refusing {net}. The sweep limit is a /24 on your own LAN.")
+
+
+def network_for_router(value: str) -> ipaddress.IPv4Network:
+    try:
+        ip = ipaddress.ip_address(value.strip())
+    except ValueError as exc:
+        raise SystemExit(f"Not an IPv4 router address: {value}") from exc
+    if not isinstance(ip, ipaddress.IPv4Address):
+        raise SystemExit("IPv6 routers are not swept.")
+    if ip.is_loopback or not ip.is_private or ip.packed[-1] in {0, 255}:
+        raise SystemExit(f"Refusing {ip}. Set the private address of your own gateway.")
+    net = ipaddress.ip_network(f"{ip}/24", strict=False)
+    assert_private(net)
+    return net
+
+
+def saved_router() -> str | None:
+    if not ROUTER.exists():
+        return None
+    text = ROUTER.read_text().strip()
+    return text or None
+
+
+def save_router(ip: str) -> None:
+    ROOT.mkdir(parents=True, exist_ok=True)
+    ROUTER.write_text(ip + "\n")
 
 
 def detect_subnet() -> ipaddress.IPv4Network:
@@ -299,7 +329,22 @@ def report(subnet: str, hosts: list[dict[str, str]], known: set[str], changes: l
 
 
 def cmd_sweep(args: argparse.Namespace) -> int:
-    net = parse_subnet(args.subnet) if args.subnet else detect_subnet()
+    if args.router and args.subnet:
+        raise SystemExit("Pass either --router or --subnet, not both.")
+    if args.router:
+        gateway = str(ipaddress.ip_address(args.router.strip()))
+        net = network_for_router(gateway)
+        save_router(gateway)
+    elif args.subnet:
+        net = parse_subnet(args.subnet)
+    else:
+        remembered = saved_router()
+        if not remembered:
+            raise SystemExit(
+                "Router address is required. Set yours first:\n"
+                "  python3 rex-network-watcher.py router 192.168.1.1"
+            )
+        net = network_for_router(remembered)
     hosts = census(net)
     day = today_key()
     path = save_day(day, str(net), hosts)
@@ -337,6 +382,25 @@ def cmd_accept(_args: argparse.Namespace) -> int:
             macs.add(mac)
     save_known(macs)
     print(f"Baseline now holds {len(macs)} hosts ({path.name}).")
+    return 0
+
+
+def cmd_router(args: argparse.Namespace) -> int:
+    if args.clear:
+        if ROUTER.exists():
+            ROUTER.unlink()
+        print("Router cleared. Set one before the next sweep.")
+        return 0
+    if args.address:
+        net = network_for_router(args.address)
+        gateway = str(ipaddress.ip_address(args.address.strip()))
+        save_router(gateway)
+        print(f"Router {gateway}  subnet {net}")
+        return 0
+    remembered = saved_router()
+    if not remembered:
+        raise SystemExit("No router set. Example: python3 rex-network-watcher.py router 192.168.1.1")
+    print(f"Router {remembered}  subnet {network_for_router(remembered)}")
     return 0
 
 
@@ -379,6 +443,19 @@ def selftest() -> int:
     else:
         raise AssertionError("oversized prefix was allowed")
     assert_private(ipaddress.ip_network("192.168.0.0/24"))
+    assert str(network_for_router("192.168.1.1")) == "192.168.1.0/24"
+    try:
+        network_for_router("8.8.8.8")
+    except SystemExit:
+        pass
+    else:
+        raise AssertionError("public router was allowed")
+    try:
+        network_for_router("192.168.0.0")
+    except SystemExit:
+        pass
+    else:
+        raise AssertionError("network address was allowed as a router")
     print("selftest ok")
     return 0
 
@@ -387,9 +464,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Defensive census of your own local network.")
     sub = parser.add_subparsers(dest="command", required=True)
     sweep = sub.add_parser("sweep", help="Ping your subnet, read ARP, save today's census")
-    sweep.add_argument("--subnet", help="Private IPv4 subnet, /24 or smaller. Default: detected LAN")
+    sweep.add_argument("--router", help="Private IPv4 gateway. Saved and reused until you change it.")
+    sweep.add_argument("--subnet", help="Private IPv4 subnet, /24 or smaller, if you already know the prefix")
     sweep.add_argument("--json", action="store_true", help="Write sweep JSON to stdout for the desk import")
     sweep.set_defaults(func=cmd_sweep)
+    router = sub.add_parser("router", help="Set or show this machine's gateway address")
+    router.add_argument("address", nargs="?", help="Private IPv4 address of your router")
+    router.add_argument("--clear", action="store_true", help="Forget the saved router")
+    router.set_defaults(func=cmd_router)
     accept = sub.add_parser("accept", help="Trust every host in the latest census")
     accept.set_defaults(func=cmd_accept)
     diff = sub.add_parser("diff", help="Print only what changed since the previous census")

@@ -8,20 +8,30 @@ It ping-sweeps your private IPv4 LAN, reads the ARP table, reverse-resolves host
 
 Use it only on a network you are allowed to inventory.
 
+## Your router
+
+The router address is required. It is not pinned to one cabin. Set the gateway on the machine you are watching, then sweep. Change it any time.
+
+```bash
+python3 rex-network-watcher.py router 192.168.1.1
+python3 rex-network-watcher.py sweep
+```
+
+That address is saved in `~/.local/share/rex-network-watcher/router` and reused until you set a different one. A sweep with no router set refuses to run.
+
 ## Run
 
 Python 3.9+ and the system `ping` plus `ip` (Linux) or `arp` (macOS). No third-party packages.
 
 ```bash
 python3 rex-network-watcher.py selftest
+python3 rex-network-watcher.py router 192.168.1.1
 python3 rex-network-watcher.py sweep
 python3 rex-network-watcher.py accept
 python3 rex-network-watcher.py diff
 ```
 
-`sweep --json` prints a census the desk can import. Files land in `~/.local/share/rex-network-watcher/`.
-
-Only private prefixes of /24 or smaller are swept. Pass `--subnet 192.168.1.0/24` when you want a specific one you are on.
+`sweep --router 192.168.1.1` sets the gateway and sweeps in one step. `sweep --json` prints a census the desk can import. Only private /24 prefixes are swept.
 
 ## What the flags mean
 
