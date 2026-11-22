@@ -1,5 +1,13 @@
 # Rex's Network Watcher
 
+[![Live desk](https://img.shields.io/badge/LIVE%20DESK-open%20it-0c0b09?style=for-the-badge&labelColor=2ad4c4)](https://masterxhackerx420-oss.github.io/rex-network-watcher/)
+
+**Live desk:** [https://masterxhackerx420-oss.github.io/rex-network-watcher/](https://masterxhackerx420-oss.github.io/rex-network-watcher/)
+
+The button above is the desk. This repository is the field kit that runs on the machine.
+
+[![The live desk, empty until you import your own sweep](art/live-desk.png)](https://masterxhackerx420-oss.github.io/rex-network-watcher/)
+
 ![Rex Wolf at the cabin bench](art/rex-wolf.jpg)
 
 Defensive census of a network you own.
@@ -49,4 +57,4 @@ python3 rex-network-watcher.py diff
 
 ## The desk
 
-The visual watch (cabin lab, new-host alert, trust list, daily delta) is the standalone Rex's Network Watcher page. A browser cannot ARP a house, so the cabin wire is a local lab. Import `sweep --json` from this script when you want the real census in that desk. The baseline in the page stays in the browser. This script's baseline stays on the machine.
+The live desk is [https://masterxhackerx420-oss.github.io/rex-network-watcher/](https://masterxhackerx420-oss.github.io/rex-network-watcher/). A browser cannot ARP a house. Import `sweep --json` from this script when you want your census there. The cabin list is a sample button, not the default. The baseline in the page stays in the browser. This script's baseline stays on the machine.
