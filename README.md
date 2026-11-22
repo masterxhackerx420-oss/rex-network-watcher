@@ -1,13 +1,5 @@
 # Rex's Network Watcher
 
-[![Live desk](https://img.shields.io/badge/LIVE%20DESK-open%20it-0c0b09?style=for-the-badge&labelColor=2ad4c4)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/masterxhackerx420-oss/rex-network-watcher/main/docs/index.html)
-
-**Live desk:** [open it](https://htmlpreview.github.io/?https://raw.githubusercontent.com/masterxhackerx420-oss/rex-network-watcher/main/docs/index.html)
-
-The button above is the desk. This repository is the field kit that runs on the machine.
-
-[![The live desk, empty until you import your own sweep](art/live-desk.png)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/masterxhackerx420-oss/rex-network-watcher/main/docs/index.html)
-
 ![Rex Wolf at the cabin bench](art/rex-wolf.jpg)
 
 Defensive census of a network you own.
@@ -45,7 +37,7 @@ python3 rex-network-watcher.py accept
 python3 rex-network-watcher.py diff
 ```
 
-`sweep --json` prints a census you can import into the desk. Only private /24 prefixes are swept.
+`sweep --json` prints the census. Only private /24 prefixes are swept.
 
 ## What the flags mean
 
@@ -54,7 +46,3 @@ python3 rex-network-watcher.py diff
 - **Since yesterday** — new, gone, or a changed IP versus the previous census
 
 `accept` trusts every host in the latest census. Run that once you recognize the wire, then let `diff` be the daily alarm.
-
-## The desk
-
-The live desk is [open it](https://htmlpreview.github.io/?https://raw.githubusercontent.com/masterxhackerx420-oss/rex-network-watcher/main/docs/index.html). A browser cannot ARP a house. Import `sweep --json` from this script when you want your census there. The cabin list is a sample button, not the default. The baseline in the page stays in the browser. This script's baseline stays on the machine.
