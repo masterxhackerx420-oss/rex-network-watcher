@@ -1,12 +1,12 @@
 # Rex's Network Watcher
 
-[![Live desk](https://img.shields.io/badge/LIVE%20DESK-open%20it-0c0b09?style=for-the-badge&labelColor=2ad4c4)](https://masterxhackerx420-oss.github.io/rex-network-watcher/)
+[![Live desk](https://img.shields.io/badge/LIVE%20DESK-open%20it-0c0b09?style=for-the-badge&labelColor=2ad4c4)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/masterxhackerx420-oss/rex-network-watcher/main/docs/index.html)
 
-**Live desk:** [https://masterxhackerx420-oss.github.io/rex-network-watcher/](https://masterxhackerx420-oss.github.io/rex-network-watcher/)
+**Live desk:** [open it](https://htmlpreview.github.io/?https://raw.githubusercontent.com/masterxhackerx420-oss/rex-network-watcher/main/docs/index.html)
 
 The button above is the desk. This repository is the field kit that runs on the machine.
 
-[![The live desk, empty until you import your own sweep](art/live-desk.png)](https://masterxhackerx420-oss.github.io/rex-network-watcher/)
+[![The live desk, empty until you import your own sweep](art/live-desk.png)](https://htmlpreview.github.io/?https://raw.githubusercontent.com/masterxhackerx420-oss/rex-network-watcher/main/docs/index.html)
 
 ![Rex Wolf at the cabin bench](art/rex-wolf.jpg)
 
@@ -57,4 +57,4 @@ python3 rex-network-watcher.py diff
 
 ## The desk
 
-The live desk is [https://masterxhackerx420-oss.github.io/rex-network-watcher/](https://masterxhackerx420-oss.github.io/rex-network-watcher/). A browser cannot ARP a house. Import `sweep --json` from this script when you want your census there. The cabin list is a sample button, not the default. The baseline in the page stays in the browser. This script's baseline stays on the machine.
+The live desk is [open it](https://htmlpreview.github.io/?https://raw.githubusercontent.com/masterxhackerx420-oss/rex-network-watcher/main/docs/index.html). A browser cannot ARP a house. Import `sweep --json` from this script when you want your census there. The cabin list is a sample button, not the default. The baseline in the page stays in the browser. This script's baseline stays on the machine.
