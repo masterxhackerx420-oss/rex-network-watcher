@@ -8,16 +8,23 @@ It ping-sweeps your private IPv4 LAN, reads the ARP table, reverse-resolves host
 
 Use it only on a network you are allowed to inventory.
 
-## Your router
+## Your machine, not the cabin
 
-The router address is required. It is not pinned to one cabin. Set the gateway on the machine you are watching, then sweep. Change it any time.
+`sweep` reads the private LAN on the computer you run it on. It does not ship a host list, and it will not reuse someone else's gateway. cabin-gw, blackbeard, and wolfsec-phone are not in this tool.
+
+```bash
+python3 rex-network-watcher.py sweep
+python3 rex-network-watcher.py sweep --json
+```
+
+Change the gateway only when this machine should watch a different private /24 you own:
 
 ```bash
 python3 rex-network-watcher.py router 192.168.1.1
 python3 rex-network-watcher.py sweep
 ```
 
-That address is saved in `~/.local/share/rex-network-watcher/router` and reused until you set a different one. A sweep with no router set refuses to run.
+A saved router that is not on this machine is ignored, and the sweep uses the LAN that is.
 
 ## Run
 
@@ -25,13 +32,12 @@ Python 3.9+ and the system `ping` plus `ip` (Linux) or `arp` (macOS). No third-p
 
 ```bash
 python3 rex-network-watcher.py selftest
-python3 rex-network-watcher.py router 192.168.1.1
 python3 rex-network-watcher.py sweep
 python3 rex-network-watcher.py accept
 python3 rex-network-watcher.py diff
 ```
 
-`sweep --router 192.168.1.1` sets the gateway and sweeps in one step. `sweep --json` prints a census the desk can import. Only private /24 prefixes are swept.
+`sweep --json` prints a census you can import into the desk. Only private /24 prefixes are swept.
 
 ## What the flags mean
 

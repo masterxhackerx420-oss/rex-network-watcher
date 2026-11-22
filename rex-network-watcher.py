@@ -5,17 +5,18 @@ Sweeps your local IPv4 subnet with ICMP echo, reads the OS ARP table,
 reverse-resolves names, and diffs against a baseline that never leaves
 this machine.
 
-  python3 rex-network-watcher.py router 192.168.1.1
   python3 rex-network-watcher.py sweep
   python3 rex-network-watcher.py sweep --json
   python3 rex-network-watcher.py accept
   python3 rex-network-watcher.py diff
+  python3 rex-network-watcher.py router 192.168.1.1
   python3 rex-network-watcher.py selftest
 
-The router address is required on a new machine and is saved under
-~/.local/share/rex-network-watcher/. Change it any time with `router`.
-Only private prefixes of /24 or smaller are allowed. There is no port
-scan, no credential use, and no upload.
+The first sweep reads the private LAN on this machine. It does not use
+anyone else's gateway. Change it with `router` only when this computer
+should watch a different private /24 you own. A saved router that is
+not on this machine is ignored. Only private prefixes of /24 or smaller
+are allowed. There is no port scan, no credential use, and no upload.
 """
 
 from __future__ import annotations
@@ -315,7 +316,7 @@ def print_changes(changes: list[dict[str, str]], sink) -> None:
 
 
 def report(subnet: str, hosts: list[dict[str, str]], known: set[str], changes: list[dict[str, str]], sink) -> None:
-    print("Rex's Network Watcher", file=sink)
+    print("Rex's Network Watcher — this machine only", file=sink)
     print(f"subnet {subnet}   {len(hosts)} hosts   baseline {len(known)}", file=sink)
     if not hosts:
         print("Nobody answered.", file=sink)
@@ -326,6 +327,14 @@ def report(subnet: str, hosts: list[dict[str, str]], known: set[str], changes: l
     if not known and hosts:
         print("Nothing is trusted yet. Run: python3 rex-network-watcher.py accept", file=sink)
     print_changes(changes, sink)
+
+
+def router_on_this_machine(ip: str) -> bool:
+    try:
+        here = detect_subnet()
+    except SystemExit:
+        return False
+    return ipaddress.ip_address(ip) in here
 
 
 def cmd_sweep(args: argparse.Namespace) -> int:
@@ -339,12 +348,15 @@ def cmd_sweep(args: argparse.Namespace) -> int:
         net = parse_subnet(args.subnet)
     else:
         remembered = saved_router()
-        if not remembered:
-            raise SystemExit(
-                "Router address is required. Set yours first:\n"
-                "  python3 rex-network-watcher.py router 192.168.1.1"
-            )
-        net = network_for_router(remembered)
+        if remembered and router_on_this_machine(remembered):
+            net = network_for_router(remembered)
+        else:
+            if remembered:
+                print(
+                    f"Saved router {remembered} is not on this machine. Sweeping the LAN that is.",
+                    file=sys.stderr,
+                )
+            net = detect_subnet()
     hosts = census(net)
     day = today_key()
     path = save_day(day, str(net), hosts)
