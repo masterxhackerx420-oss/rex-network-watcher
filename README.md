@@ -1,5 +1,7 @@
 # Rex's Network Watcher
 
+![Rex Wolf at the cabin bench](art/rex-wolf.jpg)
+
 Defensive census of a network you own.
 
 It ping-sweeps your private IPv4 LAN, reads the ARP table, reverse-resolves hostnames, and stores a baseline on that machine. The next day's run prints only what changed. Nothing is uploaded. There is no port scan and no credential use.
